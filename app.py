@@ -8,6 +8,7 @@ import datetime
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
+import requests, io
 
 
 
@@ -24,8 +25,11 @@ st.title("PHÂN TÍCH DỮ LIỆU THƯƠNG MẠI GIỮA VIỆT NAM VÀ TURKEY")
 
 # --- Đọc dữ liệu ---
 # Bạn có thể giữ nguyên đường dẫn hiện tại hoặc thay bằng st.file_uploader nếu muốn.
-excel_path = r'https://github.com/thuthuy119/VNM-TUR_trade/blob/main/Data%20trade%20VNM%20-%20TUR.xlsx'
-df = pd.read_excel(excel_path, sheet_name='Data')
+url = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Data.xlsx"
+content = requests.get(url).content
+df = pd.read_excel(io.BytesIO(content), sheet_name="Data", engine="openpyxl")
+
+
 df["HS2"] = df["HS2"].astype(str).str.replace(r"\D", "", regex=True).str[:2].str.zfill(2)
 df["HS4"] = df["HS4"].astype(str).str.replace(r"\D", "", regex=True).str[:4].str.zfill(4)
 df["HS6"] = df["HS6"].astype(str).str.replace(r"\D", "", regex=True).str[:6].str.zfill(6)
@@ -310,7 +314,9 @@ st.write("*Lưu ý: Dữ liệu của trang Tradesparq có thể không đầy �
 excel_path = r'D:\Dữ liệu XNK VN - TURKEY\Shipments_VN-TR.xlsx'
 
 # Đường dẫn: nên dùng raw-string để tránh lỗi ký tự escape trên Windows
-df_bol = pd.read_excel(r'https://github.com/thuthuy119/VNM-TUR_trade/blob/main/Shipments_Jan-Apr.xlsx')
+url = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Shipments_Jan-Apr.xlsx"
+content = requests.get(url).content
+df_bol = pd.read_excel(io.BytesIO(content), engine="openpyxl")
 
 st.set_page_config(page_title="Phân tích lô hàng theo HS", layout="wide")
 
@@ -530,3 +536,4 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
