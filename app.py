@@ -346,31 +346,42 @@ st.write("*Lưu ý: Dữ liệu của trang Tradesparq có thể không đầy �
 
 # ================== TIỀN XỬ LÝ ==================
 @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def prep_bol(df_bol: pd.DataFrame) -> pd.DataFrame:
-    d = df_bol.copy()
-    d.columns = d.columns.str.strip()
+    # Guard sớm
+    if df_bol is None or not isinstance(df_bol, pd.DataFrame):
+        st.error("Không nhận được DataFrame cho df_bol.")
+        return pd.DataFrame()
+    if df_bol.empty:
+        st.warning("df_bol trống.")
+        return pd.DataFrame()
 
-    # HS code → chỉ giữ số, tối đa 8 ký tự, pad trái; sinh HS2/4/6/8
-    d["Hs Code"] = d["Hs Code"].astype(str).str.replace(r"\D", "", regex=True).str[:8].str.zfill(8)
+    d = df_bol.copy()
+
+    # CỘT: ép tên cột về string + strip để tránh lỗi .str
+    d.columns = pd.Index([str(c).strip() for c in d.columns])
+
+    # Kiểm tra cột bắt buộc
+    must_have = ["Hs Code", "Date", "Amount($)", "Weight(Kg)", "Quantity", "TEU", "Freight fee"]
+    missing = [c for c in must_have if c not in d.columns]
+    if missing:
+        st.error(f"Thiếu cột: {missing}")
+        return pd.DataFrame()
+
+    # HS code → chỉ giữ số, lấy tối đa 8 ký tự, pad trái; sinh HS2/4/6/8
+    d["Hs Code"] = (
+        d["Hs Code"].astype(str).str.replace(r"\D", "", regex=True).str[:8].str.zfill(8)
+    )
     d["HS2"] = d["Hs Code"].str[:2]
     d["HS4"] = d["Hs Code"].str[:4]
     d["HS6"] = d["Hs Code"].str[:6]
     d["HS8"] = d["Hs Code"].str[:8]
 
     # Thời gian & numeric
-    d["Date"] = pd.to_datetime(d.get("Date"), errors="coerce")
-    for c in ["Amount($)", "Weight(Kg)", "Quantity", "TEU", "Freight fee", "Insurance fee"]:
-        if c in d.columns:
-            d[c] = pd.to_numeric(d[c].astype(str).str.replace(",", ""), errors="coerce").fillna(0.0)
+    d["Date"] = pd.to_datetime(d["Date"], errors="coerce")
+    for c in ["Amount($)", "Weight(Kg)", "Quantity", "TEU", "Freight fee"]:
+        d[c] = pd.to_numeric(d[c], errors="coerce")
 
-    # Chuẩn hoá cột cảng: rỗng/NaN -> "Không có dữ liệu"
-    for c in ["Origin Port", "Loading Place", "Destination Port", "Unloading Place"]:
-        if c in d.columns:
-            d[c] = (
-                d[c].astype(str).str.strip()
-                  .replace({"": np.nan})
-                  .fillna("Không có dữ liệu")
-            )
     return d
 
 dfp = prep_bol(df_bol)
@@ -560,6 +571,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
