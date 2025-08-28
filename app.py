@@ -346,7 +346,7 @@ st.write("*Lưu ý: Dữ liệu của trang Tradesparq có thể không đầy �
 
 # ================== TIỀN XỬ LÝ ==================
 @st.cache_data(show_spinner=False)
-@st.cache_data(show_spinner=False)
+
 def prep_bol(df_bol: pd.DataFrame) -> pd.DataFrame:
     # Guard sớm
     if df_bol is None or not isinstance(df_bol, pd.DataFrame):
@@ -571,6 +571,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
