@@ -30,7 +30,7 @@ def load_data(url, sheet_name=None):
 
 
 # 1. Đọc Data.xlsx
-url_data = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Data.xlsx"
+url_data = "https://github.com/thuthuy119/VNM-TUR_trade/blob/main/Data%20trade%20VNM%20-%20TUR.xlsx"
 df = load_data(url_data, sheet_name="Data")
 
 # 2. Đọc Shipments_Jan-Apr.xlsx
@@ -542,6 +542,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
