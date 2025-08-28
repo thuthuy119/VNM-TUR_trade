@@ -9,7 +9,7 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 import requests
-import io
+from io import BytesIO
 from pathlib import Path
 
 
@@ -22,14 +22,20 @@ from pathlib import Path
 st.set_page_config(layout="wide")
 
 st.title("PHÂN TÍCH DỮ LIỆU THƯƠNG MẠI GIỮA VIỆT NAM VÀ TURKEY")
+# đọc dữ liệu
+def load_data(url, sheet_name=None):
+    response = requests.get(url)
+    response.raise_for_status()  # nếu có lỗi 404/403 thì sẽ dừng ở đây
+    return pd.read_excel(BytesIO(response.content), sheet_name=sheet_name, engine="openpyxl")
 
 
+# 1. Đọc Data.xlsx
+url_data = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Data.xlsx"
+df = load_data(url_data, sheet_name="Data")
 
-# --- Đọc dữ liệu ---
-# Bạn có thể giữ nguyên đường dẫn hiện tại hoặc thay bằng st.file_uploader nếu muốn.
-url = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Data.xlsx"
-content = requests.get(url).content
-df = pd.read_excel(io.BytesIO(content), sheet_name="Data", engine="openpyxl")
+# 2. Đọc Shipments_Jan-Apr.xlsx
+url_bol = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Shipments_Jan-Apr.xlsx"
+df_bol = load_data(url_bol)
 
 
 df["HS2"] = df["HS2"].astype(str).str.replace(r"\D", "", regex=True).str[:2].str.zfill(2)
@@ -310,17 +316,15 @@ st.table(sty)
 df.drop(columns=[c for c in ["_hs_code_str", "_hs_name_str"] if c in df.columns], inplace=True, errors="ignore")
 
 
+
+
+
+
+
+#-------------------------------------------------------
+
 st.header("Phần 2. Dữ liệu vận đơn năm 2024 (Nguồn: Tradesparq)")
 st.write("*Lưu ý: Dữ liệu của trang Tradesparq có thể không đầy đủ*")
-
-excel_path = r'D:\Dữ liệu XNK VN - TURKEY\Shipments_VN-TR.xlsx'
-
-# Đường dẫn: nên dùng raw-string để tránh lỗi ký tự escape trên Windows
-url = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Shipments_Jan-Apr.xlsx"
-content = requests.get(url).content
-df_bol = pd.read_excel(io.BytesIO(content), engine="openpyxl")
-
-st.set_page_config(page_title="Phân tích lô hàng theo HS", layout="wide")
 
 # ================== TIỀN XỬ LÝ ==================
 @st.cache_data(show_spinner=False)
@@ -538,6 +542,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
