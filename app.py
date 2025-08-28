@@ -155,7 +155,7 @@ with a: st.caption(f"Cơ cấu HS2 – {y1} (Top {topN})"); plot_donut(p1_2,o1_2
 with b: st.caption(f"Cơ cấu HS2 – {y2} (Top {topN})"); plot_donut(p2_2,o2_2,y2,t2_2,cmap2,hide_legend)
 
 # ================== (B) ĐẨY 2 SELECTION XUỐNG ĐÂY ==================
-st.markdown(f"###### Phân tích {detail_level} (thuộc HS2 {hs2_pick})")
+
 
 # HS2 options (chỉ những HS2 có tổng > 0)
 hs2_opt = (
@@ -194,7 +194,7 @@ p1_x,o1_x,t1_x = donut_parts(aggX, y1, topN)
 p2_x,o2_x,t2_x = donut_parts(aggX, y2, topN)  
 cmapX = cmap_from(o1_x,o2_x)
 
-
+st.markdown(f"###### Phân tích {detail_level} (thuộc HS2 {hs2_pick})")
 c,d = st.columns(2)
 with c: st.caption(f"Cơ cấu {detail_level} – {y1} (Top {topN})"); plot_donut(p1_x,o1_x,y1,t1_x,cmapX,hide_legend)
 with d: st.caption(f"Cơ cấu {detail_level} – {y2} (Top {topN})"); plot_donut(p2_x,o2_x,y2,t2_x,cmapX,hide_legend)
@@ -571,6 +571,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
