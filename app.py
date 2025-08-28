@@ -22,21 +22,15 @@ from pathlib import Path
 st.set_page_config(layout="wide")
 
 st.title("PHÂN TÍCH DỮ LIỆU THƯƠNG MẠI GIỮA VIỆT NAM VÀ TURKEY")
+
+
 # đọc dữ liệu
-def load_data(url, sheet_name=None):
-    response = requests.get(url)
-    response.raise_for_status()  # nếu có lỗi 404/403 thì sẽ dừng ở đây
-    return pd.read_excel(BytesIO(response.content), sheet_name=sheet_name, engine="openpyxl")
+st.set_page_config(layout="wide")
+BASE = Path(__file__).parent
 
-
-# 1. Đọc Data.xlsx
-url_data = "https://github.com/thuthuy119/VNM-TUR_trade/blob/main/Data%20trade%20VNM%20-%20TUR.xlsx"
-df = load_data(url_data, sheet_name="Data")
-
-# 2. Đọc Shipments_Jan-Apr.xlsx
-url_bol = "https://github.com/thuthuy119/VNM-TUR_trade/blob/main/Shipments_Jan-Apr.xlsx"
-df_bol = load_data(url_bol)
-
+# Nếu file ở cùng thư mục với app.py:
+df = pd.read_excel(BASE / "Data trade VNM - TUR.xlsx", sheet_name="Data", engine="openpyxl")
+df_bol = pd.read_excel(BASE / "Shipments_Jan-Apr.xlsx", engine="openpyxl")
 
 df["HS2"] = df["HS2"].astype(str).str.replace(r"\D", "", regex=True).str[:2].str.zfill(2)
 df["HS4"] = df["HS4"].astype(str).str.replace(r"\D", "", regex=True).str[:4].str.zfill(4)
@@ -542,6 +536,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
