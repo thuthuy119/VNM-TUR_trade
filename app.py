@@ -21,7 +21,7 @@ from pathlib import Path
 
 st.set_page_config(layout="wide")
 
-st.title("PHÂN TÍCH DỮ LIỆU THƯƠNG MẠI GIỮA VIỆT NAM VÀ TURKEY")
+st.title("PHÂN TÍCH DỮ LIỆU THƯƠNG MẠI GIỮA VIỆT NAM VÀ THỔ NHĨ KỲ")
 
 
 @st.cache_data(show_spinner=False)
@@ -65,7 +65,7 @@ df["HS6"] = df["HS6"].astype(str).str.replace(r"\D", "", regex=True).str[:6].str
 st.header("Phần 1. Dữ liệu xuất nhập khẩu 5 năm (2020 - 2024) (Nguồn: Trademap)")
 
 
-CRIT = "Turkey nhập khẩu từ Việt Nam"
+CRIT = "Thổ Nhĩ Kỳ nhập khẩu từ Việt Nam"
 @st.cache_data(show_spinner=False)
 def prep_df(_df: pd.DataFrame, crit: str) -> pd.DataFrame:
     d = _df.copy()
@@ -147,7 +147,7 @@ p1_2,o1_2,t1_2 = donut_parts(agg2, y1, topN)
 p2_2,o2_2,t2_2 = donut_parts(agg2, y2, topN)
 cmap2 = cmap_from(o1_2,o2_2)
 
-st.subheader("1.1. Top các mặt hàng Việt Nam xuất khẩu sang Turkey nhiều nhất")
+st.subheader("1.1. Top các mặt hàng Việt Nam xuất khẩu sang Thổ Nhĩ Kỳ nhiều nhất")
 
 st.markdown(f'###### Tất cả mã HS cấp 2')
 a,b = st.columns(2)
@@ -260,9 +260,9 @@ df_filtered = df_filtered[(df_filtered["Year"] >= 2020) & (df_filtered["Year"] <
 
 # --- Bước 2: Chuẩn bị dữ liệu cho biểu đồ ---
 criteria_list = [
-    "Turkey nhập khẩu từ Việt Nam",
+    "Thổ Nhĩ Kỳ nhập khẩu từ Việt Nam",
     "Tổng kim ngạch xuất khẩu của Việt Nam",
-    "Tổng kim ngạch nhập khẩu của Turkey",
+    "Tổng kim ngạch nhập khẩu của Thổ Nhĩ Kỳ",
 ]
 
 df_plot = (
@@ -302,9 +302,9 @@ df_pivot = (
 )
 
 # Đổi tên cột cho ngắn gọn
-col_tr_vn = "Turkey nhập khẩu từ Việt Nam"
+col_tr_vn = "Thổ Nhĩ Kỳ nhập khẩu từ Việt Nam"
 col_vn_world = "Tổng kim ngạch xuất khẩu của Việt Nam"
-col_tr_world = "Tổng kim ngạch nhập khẩu của Turkey"
+col_tr_world = "Tổng kim ngạch nhập khẩu của Thổ Nhĩ Kỳ"
 
 # Tránh chia cho 0
 denom1 = df_pivot[col_tr_world].replace(0, np.nan)
@@ -571,6 +571,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
