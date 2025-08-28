@@ -8,7 +8,8 @@ import datetime
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
-import requests, io
+import requests
+from pathlib import Path
 
 
 
@@ -536,4 +537,5 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
