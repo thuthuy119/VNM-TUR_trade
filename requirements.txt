@@ -1,0 +1,12 @@
+streamlit==1.37.0
+requests
+pandas
+scikit-learn
+openpyxl
+plotly_express==0.4.0
+matplotlib==3.8.2
+seaborn==0.13.2
+requests
+plotly_express
+folium
+streamlit_folium==0.22.0
