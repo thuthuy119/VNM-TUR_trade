@@ -407,7 +407,7 @@ if not hs_code:
     st.stop()
 
 # ⚙️ Tuỳ chọn hiển thị trong sidebar
-legend_on = st.checkbox("Ẩn legend", value=False)
+legend_on = not st.checkbox("Ẩn legend", value=False)
 
 sub = dfp[dfp[hs_level] == hs_code].copy()
 
@@ -547,6 +547,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
