@@ -23,30 +23,23 @@ st.set_page_config(layout="wide")
 
 st.title("PHÂN TÍCH DỮ LIỆU THƯƠNG MẠI GIỮA VIỆT NAM VÀ THỔ NHĨ KỲ")
 
+RAW_DF_URL = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Data%20trade%20VNM%20-%20TUR.xlsx"
+RAW_BOL_URL = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Shipments_Jan-Apr.xlsx"
+# (có thể dùng dạng blob + ?raw=1 cũng được:
+# "https://github.com/.../Data%20trade%20VNM%20-%20TUR.xlsx?raw=1")
 
-@st.cache_data(show_spinner=False)
-def load_excel_from_raw(url, sheet_name=None):
-    r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
-    # 1) HTTP ok?
-    if r.status_code != 200:
-        raise RuntimeError(f"HTTP {r.status_code} khi tải: {url}")
+@st.cache_data
+def load_data(raw_url: str) -> pd.DataFrame:
+    r = requests.get(raw_url, timeout=30)
+    r.raise_for_status()
+    # kiểm tra nhanh content-type để tránh đọc nhầm HTML
+    if "text/html" in r.headers.get("Content-Type", ""):
+        raise ValueError("URL không phải nội dung raw của file. Hãy dùng raw.githubusercontent.com hoặc ?raw=1.")
+    return pd.read_excel(BytesIO(r.content), engine="openpyxl")
 
-    ctype = r.headers.get("Content-Type", "")
-    head = r.content[:200]
+df = load_data(RAW_DF_URL)
+df_bol = load_data(RAW_BOL_URL)
 
-    # 2) LFS pointer?
-    if head.startswith(b"version https://git-lfs.github.com/spec"):
-        raise RuntimeError("File đang là Git LFS pointer, không phải .xlsx thật. Hãy tải file binary vào repo (không dùng LFS) hoặc đọc cục bộ.")
-
-    # 3) .xlsx (ZIP) phải bắt đầu bằng b'PK\x03\x04'
-    if r.content[:4] != b"PK\x03\x04":
-        raise RuntimeError(
-            "Nội dung tải về KHÔNG phải .xlsx (ZIP). "
-            f"Content-Type={ctype}. Preview={head!r}\nURL: {url}\n"
-            "→ Kiểm tra lại: dùng raw.githubusercontent.com, đúng nhánh/thư mục/tên file, và file là .xlsx thật."
-        )
-
-    return pd.read_excel(BytesIO(r.content), sheet_name=sheet_name, engine="openpyxl")
 
 # DÙNG URL RAW (đã URL-encode dấu cách):
 url_data = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Data%20trade%20VNM%20-%20TUR.xlsx"
@@ -65,7 +58,7 @@ df["HS6"] = df["HS6"].astype(str).str.replace(r"\D", "", regex=True).str[:6].str
 st.header("Phần 1. Dữ liệu xuất nhập khẩu 5 năm (2020 - 2024) (Nguồn: Trademap)")
 
 
-CRIT = "Thổ Nhĩ Kỳ nhập khẩu từ Việt Nam"
+CRIT = "Turkey nhập khẩu từ Việt Nam"
 @st.cache_data(show_spinner=False)
 def prep_df(_df: pd.DataFrame, crit: str) -> pd.DataFrame:
     d = _df.copy()
@@ -260,9 +253,9 @@ df_filtered = df_filtered[(df_filtered["Year"] >= 2020) & (df_filtered["Year"] <
 
 # --- Bước 2: Chuẩn bị dữ liệu cho biểu đồ ---
 criteria_list = [
-    "Thổ Nhĩ Kỳ nhập khẩu từ Việt Nam",
+    "Turkey nhập khẩu từ Việt Nam",
     "Tổng kim ngạch xuất khẩu của Việt Nam",
-    "Tổng kim ngạch nhập khẩu của Thổ Nhĩ Kỳ",
+    "Tổng kim ngạch nhập khẩu của Turkey",
 ]
 
 df_plot = (
@@ -302,9 +295,9 @@ df_pivot = (
 )
 
 # Đổi tên cột cho ngắn gọn
-col_tr_vn = "Thổ Nhĩ Kỳ nhập khẩu từ Việt Nam"
+col_tr_vn = "Turkey nhập khẩu từ Việt Nam"
 col_vn_world = "Tổng kim ngạch xuất khẩu của Việt Nam"
-col_tr_world = "Tổng kim ngạch nhập khẩu của Thổ Nhĩ Kỳ"
+col_tr_world = "Tổng kim ngạch nhập khẩu của Turkey"
 
 # Tránh chia cho 0
 denom1 = df_pivot[col_tr_world].replace(0, np.nan)
@@ -561,6 +554,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
