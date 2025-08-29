@@ -41,13 +41,6 @@ df = load_data(RAW_DF_URL)
 df_bol = load_data(RAW_BOL_URL)
 
 
-# DÙNG URL RAW (đã URL-encode dấu cách):
-url_data = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Data%20trade%20VNM%20-%20TUR.xlsx"
-df = load_excel_from_raw(url_data, sheet_name="Data")
-
-url_bol = "https://raw.githubusercontent.com/thuthuy119/VNM-TUR_trade/main/Shipments_Jan-Apr.xlsx"
-df_bol = load_excel_from_raw(url_bol)
-
 #----
 df["HS2"] = df["HS2"].astype(str).str.replace(r"\D", "", regex=True).str[:2].str.zfill(2)
 df["HS4"] = df["HS4"].astype(str).str.replace(r"\D", "", regex=True).str[:4].str.zfill(4)
@@ -554,6 +547,7 @@ def _top20_table(df: pd.DataFrame, name_col: str, title_entity_vi: str):
 #_ top20_table = _top20_table  # giữ nguyên tên hàm gốc nếu cần dùng nơi khác
 _top20_table(sub, EXPORTER_NAME, "Nhà xuất khẩu")
 _top20_table(sub, IMPORTER_NAME, "Nhà nhập khẩu")
+
 
 
 
